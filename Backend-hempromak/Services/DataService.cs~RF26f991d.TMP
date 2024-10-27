@@ -1,0 +1,6 @@
+﻿namespace Backend_hempromak.Services
+{
+    public class DataService
+    {
+    }
+}

@@ -1,0 +1,6 @@
+@Backend_hempromak_HostAddress = http://localhost:5258
+
+GET {{Backend_hempromak_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

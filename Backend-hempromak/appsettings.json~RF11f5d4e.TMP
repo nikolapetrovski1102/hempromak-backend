@@ -1,0 +1,13 @@
+{
+  "Logging": {
+    "LogLevel": {
+      "Default": "Information",
+      "Microsoft.AspNetCore": "Warning"
+    }
+  },
+  "Jwt": {
+    "Key=" "48b03961e8a7421ef42c48d65c3c3e8f47e622eb3d99adc629af45d6bfbe7bfc7ea882f82f6f91d5d474e88104776714cc4a7f1a1d79571ec35175ac8a908d67\",",
+    "Issuer="http://localhost:3001/",
+  },
+    "AllowedHosts": "*"
+  }
