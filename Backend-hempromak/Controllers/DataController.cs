@@ -3,11 +3,19 @@ using Backend_hempromak.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using QuestPDF.Infrastructure;
+using QuestPDF.Fluent;
+using QuestPDF.Previewer;
+using QuestPDF.Helpers;
 using System.Text.Json;
+using QuestPDF.Companion;
+using System.Net.Mail;
+using System.Net.Mime;
+
 
 namespace Backend_hempromak.Controllers
 {
-    [Authorize]
+    //[Authorize]
     [Route("api/[controller]")]
     [ApiController]
     public class DataController : ControllerBase
@@ -66,6 +74,5 @@ namespace Backend_hempromak.Controllers
             }
         }
 
-
-    }
+}
 }
