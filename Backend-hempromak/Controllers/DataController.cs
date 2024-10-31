@@ -11,6 +11,8 @@ using System.Text.Json;
 using QuestPDF.Companion;
 using System.Net.Mail;
 using System.Net.Mime;
+using System.ComponentModel;
+using System.Xml.Linq;
 
 
 namespace Backend_hempromak.Controllers
@@ -32,7 +34,7 @@ namespace Backend_hempromak.Controllers
             _dataService = new DataService(_dbContext, configuration);
         }
 
-        [HttpGet("/")]
+        [HttpGet("")]
         public IActionResult getFromTable()
         {
             try
@@ -46,7 +48,7 @@ namespace Backend_hempromak.Controllers
 
         }
 
-        [HttpPost("/postTransaction")]
+        [HttpPost("postTransaction")]
         public async Task<IActionResult> postTransaction([FromBody] TransferModel transferModel)
         {
             try
@@ -61,8 +63,8 @@ namespace Backend_hempromak.Controllers
             }
         }
 
-        [HttpGet("/getTransaction")]
-        public async Task<IActionResult> getTransaction()
+        [HttpGet("getTransactions")]
+        public async Task<IActionResult> getTransactions()
         {
             try
             {
@@ -74,5 +76,31 @@ namespace Backend_hempromak.Controllers
             }
         }
 
-}
+        [HttpGet("getTransactionDetails/{transaction_id}")]
+        public async Task<IActionResult> getTransactionDetails(int transaction_id)
+        {
+            try
+            {
+                return Ok( await _dataService.getTransactionDetailsAsync(transaction_id));
+            }
+            catch(Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        [HttpGet("getCriticalItems")]
+        public async Task<IActionResult> getCriticalItems()
+        {
+            try
+            {
+                return Ok(await _dataService.getCriticalItemsAsync());
+            }
+            catch(Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+    }
 }

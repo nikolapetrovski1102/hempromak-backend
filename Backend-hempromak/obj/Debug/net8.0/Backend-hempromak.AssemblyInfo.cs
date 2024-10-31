@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("Backend-hempromak")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+f5ddb5293e800d0c8d174955e4f88ee5c176474a")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+91e9a51c36a231975859cf393d649239605e894e")]
 [assembly: System.Reflection.AssemblyProductAttribute("Backend-hempromak")]
 [assembly: System.Reflection.AssemblyTitleAttribute("Backend-hempromak")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
