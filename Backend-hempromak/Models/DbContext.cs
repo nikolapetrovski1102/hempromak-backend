@@ -11,7 +11,7 @@ namespace Backend_hempromak.Models
         {
             try
             {
-                using (MySqlConnection con = new MySqlConnection("Server=localhost;Database=hempromak;Uid=root;Pwd="))
+                using (MySqlConnection con = new MySqlConnection("Server=MYSQL8003.site4now.net;Database=db_a056d0_hempro;Uid=a056d0_hempro;Pwd=Hempromak2024"))
                 {
                     con.Open();
 

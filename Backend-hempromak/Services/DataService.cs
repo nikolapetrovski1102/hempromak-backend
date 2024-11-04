@@ -8,6 +8,9 @@ using QuestPDF.Helpers;
 using Microsoft.AspNetCore.Mvc;
 using System.Net.Mail;
 using System.Net.Mime;
+using Org.BouncyCastle.Crypto.Operators;
+using System.Security.Policy;
+using Microsoft.AspNetCore.Components.Server.Circuits;
 
 namespace Backend_hempromak.Services
 {
@@ -28,8 +31,6 @@ namespace Backend_hempromak.Services
         {
             try
             {
-                createPDF(transferModel);
-
                 var transferItemsJson = transferModel.transfer_data;
                 var transferItems = JsonSerializer.Deserialize<List<TransferItem>>(transferItemsJson);
                 DateTime dateTimeNow = TimeZoneInfo.ConvertTime(DateTime.Now, TimeZoneInfo.FindSystemTimeZoneById("Central European Standard Time"));
@@ -52,6 +53,8 @@ namespace Backend_hempromak.Services
 
                 if (!await changStock(transferItems)) return false;
 
+                createPDF(transferModel);
+
                 return true;
             }
             catch (Exception ex)
@@ -69,9 +72,10 @@ namespace Backend_hempromak.Services
                 {
                     try
                     {
-                        _dbContext.executeSqlQuery($"UPDATE adapteri_nipli_details SET komada = '{_item.kol_sos}' WHERE sifra = {_item.sifra}");
+                        _dbContext.executeSqlQuery($"UPDATE items_adapteri_nipli_details SET komada = '{_item.kol_sos}' WHERE sifra = {_item.sifra}");
+                        _dbContext.executeSqlQuery($"UPDATE items_adapteri_nipli_details SET times_used = times_used + 1 WHERE sifra = {_item.sifra}");
                         if (Int32.Parse(_item.kol_sos) <= 10)
-                            _dbContext.executeSqlQuery($"INSERT INTO critical_items (sifra, isActive, table_from) VALUES ({Int32.Parse(_item.sifra)}, 1, 'adapteri_nipli' ) ");
+                            await criticalItem(_item.sifra, "insert");
                     }
                     catch (Exception ex) { throw new Exception(ex.Message); }
                 }
@@ -84,7 +88,19 @@ namespace Backend_hempromak.Services
             }
         }
 
-        public async Task createPDF(TransferModel transferModel)
+        private async Task criticalItem (string _item_sifra, string query_type)
+        {
+            try
+            {
+                if (query_type == "insert")
+                    _dbContext.executeSqlQuery($"INSERT INTO critical_items (sifra, isActive, table_from) VALUES ({Int32.Parse(_item_sifra)}, 1, 'adapteri_nipli') ON DUPLICATE KEY UPDATE isActive = 1");
+                else if (query_type == "update")
+                    _dbContext.executeSqlQuery($"UPDATE critical_items SET isActive = 0 WHERE sifra = {Int32.Parse(_item_sifra)}");
+            }
+            catch(Exception ex) { throw new Exception(ex.Message); }
+        }
+
+        private async Task createPDF(TransferModel transferModel)
         {
             try
             {
@@ -233,9 +249,9 @@ namespace Backend_hempromak.Services
         // Reusable style for table cells
         IContainer CellStyle(IContainer container) => container.Padding(5).Border(1).Background(Colors.Grey.Lighten3);
 
-        public async Task<List<Dictionary<string, object>>> getAll()
+        public async Task<List<Dictionary<string, object>>> getAll(string current_table)
         {
-            var query = _dbContext.executeSqlQuery("select * from adapteri_nipli as an LEFT JOIN adapteri_nipli_details as ands ON an.sifra = ands.sifra");
+            var query = _dbContext.executeSqlQuery($"SELECT * FROM items_{current_table} LEFT JOIN items_{current_table}_details ON items_{current_table}.sifra = items_{current_table}_details.sifra ORDER BY items_{current_table}_details.times_used DESC");
             
             return query;
         }
@@ -279,6 +295,80 @@ namespace Backend_hempromak.Services
             return query;
         }
 
+        public async Task<List<Dictionary<string, object>>> getHeadTypesAsync(string head_type)
+        {
+            var query = _dbContext.executeSqlQuery($"SELECT sifra, cena, opis FROM items_{head_type}_details ORDER BY times_used DESC");
+
+            var result = query.Select(item => new Dictionary<string, object>
+            {
+                { "label", $"{item["sifra"]} - {item["cena"]} MKD ({item["opis"]})" },
+                { "value", $"{item["sifra"]} - {item["cena"]} MKD {item["opis"]}" }
+            }).ToList();
+
+            return result;
+        }
+
+        public async Task<List<Dictionary<string, object>>> getItemByHeadTypeAndSifraAsync(string head_type, string sifra)
+        {
+            var query = _dbContext.executeSqlQuery($"SELECT * FROM items_{head_type} LEFT JOIN items_{head_type}_details ON items_{head_type}.sifra = items_{head_type}_details.sifra WHERE items_{head_type}.sifra = {sifra}");
+
+            return query;
+        }
+
+        public async Task<List<Dictionary<string, object>>> addItemAsync(ItemDTO item)
+        {
+
+            var item_exsists = _dbContext.executeSqlQuery($"SELECT * FROM items_{item.head_type} WHERE sifra = {item.sifra}");
+
+            if (item_exsists.Count > 0)
+            {
+                var query = _dbContext.executeSqlQuery($"UPDATE items_{item.head_type} SET head_type = '{item.head_type}', type = '{item.type}' WHERE sifra = {item.sifra}");
+
+                query = _dbContext.executeSqlQuery($"UPDATE items_{item.head_type}_details SET cena = {item.cena}, komada = '{item.komada}', opis = '{item.opis}', times_used = times_used + 1 WHERE sifra = {item.sifra} AND ABS(cena - {item.cena}) < 0.01");
+
+                if (item.komada > 10)
+                    await criticalItem(item.sifra, "update");
+
+                return query;
+            }   
+            else
+            {
+                var query = _dbContext.executeSqlQuery($@"
+                    INSERT INTO items_{item.head_type} (sifra, head_type, type) 
+                    VALUES ({Int32.Parse(item.sifra)}, '{item.head_type}', '{item.type}');
+                ");
+
+                query = _dbContext.executeSqlQuery($@"
+                    INSERT INTO items_{item.head_type}_details (sifra, cena, komada, opis, times_used)
+                    VALUES ({Int32.Parse(item.sifra)}, {item.cena}, '{item.komada}', '{item.opis}', 0);
+                ");
+
+                return query;
+
+            }
+        }
+
+        public async Task<List<List<Dictionary<string, object>>>> getCriticalItemAsync()
+        {
+            var table_from = _dbContext.executeSqlQuery("SELECT DISTINCT(table_from) FROM critical_items WHERE isActive = 1");
+            var queries = new List<List<Dictionary<string, object>>>();
+
+            foreach (var table in table_from)
+            {
+                if (table.ContainsKey("table_from") && table["table_from"] != null)
+                {
+                    var table_name = table["table_from"].ToString();
+
+                    var query = _dbContext.executeSqlQuery($"SELECT {table_name}.sifra, {table_name}.head_type, {table_name}.type, {table_name}_details.komada, {table_name}_details.cena, {table_name}_details.opis FROM critical_items AS ct LEFT JOIN {table_name}_details ON ct.sifra = {table_name}_details.sifra LEFT JOIN {table_name} ON {table_name}_details.sifra = {table_name}.sifra WHERE ct.isActive = 1 AND {table_name}_details.komada < 10 ORDER BY {table_name}_details.times_used DESC");
+
+                    queries.Add(query);
+
+                }
+            }
+
+            return queries;
+
+        }
 
     }
 }

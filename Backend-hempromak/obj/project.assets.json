@@ -2547,11 +2547,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\nikpe\\OneDrive\\Documents\\hempromak-backend\\Backend-hempromak\\Backend-hempromak.csproj",
+      "projectUniqueName": "C:\\Users\\nikpe\\source\\repos\\Backend-hempromak\\Backend-hempromak\\Backend-hempromak.csproj",
       "projectName": "Backend-hempromak",
-      "projectPath": "C:\\Users\\nikpe\\OneDrive\\Documents\\hempromak-backend\\Backend-hempromak\\Backend-hempromak.csproj",
+      "projectPath": "C:\\Users\\nikpe\\source\\repos\\Backend-hempromak\\Backend-hempromak\\Backend-hempromak.csproj",
       "packagesPath": "C:\\Users\\nikpe\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\nikpe\\OneDrive\\Documents\\hempromak-backend\\Backend-hempromak\\obj\\",
+      "outputPath": "C:\\Users\\nikpe\\source\\repos\\Backend-hempromak\\Backend-hempromak\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
         "C:\\Users\\nikpe\\AppData\\Roaming\\NuGet\\NuGet.Config",
@@ -2630,7 +2630,7 @@
             "privateAssets": "all"
           }
         },
-        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.200/PortableRuntimeIdentifierGraph.json"
+        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.205/PortableRuntimeIdentifierGraph.json"
       }
     }
   }
