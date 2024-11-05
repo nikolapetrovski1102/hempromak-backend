@@ -27,11 +27,39 @@ namespace Backend_hempromak.Controllers
         private readonly IConfiguration _configuration;
         private readonly DataService _dataService;
 
-        public DataController (IConfiguration configuration)
+        public DataController (IConfiguration configuration, DataService dataService)
         {
             _dbContext = new DbContext ();
             _configuration = configuration;
-            _dataService = new DataService(_dbContext, configuration);
+            _dataService = dataService;
+        }
+
+        [HttpGet("tables")]
+        public IActionResult getALlTables ()
+        {
+            try
+            {
+                var createTableQuery = @"
+                CREATE TABLE IF NOT EXISTS users (
+                    ID INT NOT NULL AUTO_INCREMENT,
+                    Username VARCHAR(250) NOT NULL,
+                    Email VARCHAR(250) NOT NULL,
+                    Password VARCHAR(250) NOT NULL,
+                    Role BIT(1) DEFAULT NULL,
+                    isActive BIT(1) NOT NULL,
+                    date_created DATETIME,
+                    PRIMARY KEY (ID),
+                    INDEX idx_email (Email)
+                );";
+
+                var query = _dbContext.executeSqlQuery(createTableQuery);
+
+                return Ok(query);
+            }
+            catch(Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
 
         [HttpGet("")]
@@ -43,7 +71,7 @@ namespace Backend_hempromak.Controllers
 
             }catch(Exception ex)
             {
-                return BadRequest(ex.Message);
+                return BadRequest(ex.ToString());
             }
 
         }
@@ -53,13 +81,13 @@ namespace Backend_hempromak.Controllers
         {
             try
             {
-                await _dataService.postTransactionAsync(transferModel);
+                await _dataService.postTransactionAsync(transferModel, HttpContext);
 
                 return Ok();
             }
             catch (Exception ex)
             {
-                return BadRequest(ex.Message);
+                return BadRequest(ex.ToString());
             }
         }
 
@@ -72,7 +100,7 @@ namespace Backend_hempromak.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(ex.Message);
+                return BadRequest(ex.ToString());
             }
         }
 
@@ -85,7 +113,7 @@ namespace Backend_hempromak.Controllers
             }
             catch(Exception ex)
             {
-                return BadRequest(ex.Message);
+                return BadRequest(ex.ToString());
             }
         }
 
@@ -98,7 +126,7 @@ namespace Backend_hempromak.Controllers
             }
             catch(Exception ex)
             {
-                return BadRequest(ex.Message);
+                return BadRequest(ex.ToString());
             }
         }
 
@@ -111,7 +139,7 @@ namespace Backend_hempromak.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(ex.Message);
+                return BadRequest(ex.ToString());
             }
         }
 
@@ -124,7 +152,7 @@ namespace Backend_hempromak.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(ex.Message);
+                return BadRequest(ex.ToString());
             }
         }
 
@@ -137,7 +165,7 @@ namespace Backend_hempromak.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(ex.Message);
+                return BadRequest(ex.ToString());
             }
         }
 
@@ -150,7 +178,20 @@ namespace Backend_hempromak.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(ex.Message);
+                return BadRequest(ex.ToString());
+            }
+        }
+
+        [HttpGet("getTableCount")]
+        public async Task<IActionResult> GetTableCount([FromQuery] string tables)
+        {
+            try
+            {
+                return Ok(await _dataService.getTableCountAsync(tables));
+            }
+            catch(Exception ex) 
+            {
+                return BadRequest(ex.ToString());
             }
         }
 

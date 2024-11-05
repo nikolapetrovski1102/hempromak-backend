@@ -6,7 +6,102 @@
     "HttpMethod": "GET",
     "IsController": true,
     "Order": 0,
+    "Parameters": [
+      {
+        "Name": "current_table",
+        "Type": "System.String",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Backend_hempromak.Controllers.DataController",
+    "Method": "addItem",
+    "RelativePath": "api/Data/addItems",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "item",
+        "Type": "Backend_hempromak.Models.ItemDTO",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Backend_hempromak.Controllers.DataController",
+    "Method": "getCriticalItem",
+    "RelativePath": "api/Data/criticalItem",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
     "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Backend_hempromak.Controllers.DataController",
+    "Method": "getCriticalItems",
+    "RelativePath": "api/Data/getCriticalItems",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Backend_hempromak.Controllers.DataController",
+    "Method": "getHeadTypes",
+    "RelativePath": "api/Data/getHeadTypes",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "head_type",
+        "Type": "System.String",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Backend_hempromak.Controllers.DataController",
+    "Method": "getItemByHeadTypeAndSifra",
+    "RelativePath": "api/Data/getItemByHeadTypeAndSifra",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "head_type",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "sifra",
+        "Type": "System.String",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Backend_hempromak.Controllers.DataController",
+    "Method": "GetTableCount",
+    "RelativePath": "api/Data/getTableCount",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "tables",
+        "Type": "System.String",
+        "IsRequired": false
+      }
+    ],
     "ReturnTypes": []
   },
   {
@@ -49,6 +144,16 @@
         "IsRequired": true
       }
     ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Backend_hempromak.Controllers.DataController",
+    "Method": "getALlTables",
+    "RelativePath": "api/Data/tables",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
     "ReturnTypes": []
   },
   {

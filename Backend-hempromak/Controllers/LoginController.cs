@@ -17,13 +17,13 @@ namespace Backend_hempromak.Controllers
     {
         private readonly IConfiguration _config;
         private readonly DbContext _dbContext;
-        private readonly LoginService _loginService;
+        private readonly ILoginService _loginService;
 
-        public LoginController(IConfiguration config)
+        public LoginController(IConfiguration config, ILoginService loginService)
         {
             _config = config;
             _dbContext = new DbContext();
-            _loginService = new LoginService(_dbContext, _config);
+            _loginService = loginService;
         }
 
         [HttpPost("/register")]

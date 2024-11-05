@@ -21,11 +21,13 @@ namespace Backend_hempromak.Services
     {
         private readonly DbContext _dbContext;
         private readonly IConfiguration _configuration;
+        private readonly IHttpContextAccessor _httpContextAccessor;
 
-        public LoginService(DbContext dbContext, IConfiguration configuration)
+        public LoginService(DbContext dbContext, IConfiguration configuration, IHttpContextAccessor httpContextAccessor)
         {
             _dbContext = dbContext;
             _configuration = configuration;
+            _httpContextAccessor = httpContextAccessor;
         }
 
         // 1. Register a New User
@@ -64,6 +66,9 @@ namespace Backend_hempromak.Services
                 var foundPassword = storedPassword[0]["Password"].ToString();
 
                 if (storedPassword == null || !VerifyPassword(loginRequest.Password, foundPassword)) return null;
+
+                var context = _httpContextAccessor.HttpContext;
+                context.Session.SetString("email", loginRequest.EmailOrUsername.ToString());
 
                 return GenerateJwtToken(loginRequest);
             }

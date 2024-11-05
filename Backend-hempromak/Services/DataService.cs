@@ -11,6 +11,7 @@ using System.Net.Mime;
 using Org.BouncyCastle.Crypto.Operators;
 using System.Security.Policy;
 using Microsoft.AspNetCore.Components.Server.Circuits;
+using Microsoft.AspNetCore.Http.HttpResults;
 
 namespace Backend_hempromak.Services
 {
@@ -19,15 +20,17 @@ namespace Backend_hempromak.Services
 
         private readonly DbContext _dbContext;
         private readonly IConfiguration _configuration;
+        private readonly IHttpContextAccessor _httpContextAccessor;
         private MemoryStream _pdfStream;
 
-        public DataService(DbContext dbContext, IConfiguration configuration)
+        public DataService(DbContext dbContext, IConfiguration configuration, IHttpContextAccessor httpContextAccessor)
         {
             _dbContext = dbContext;
             _configuration = configuration;
+            _httpContextAccessor = httpContextAccessor;
         }
 
-        public async Task<bool> postTransactionAsync (TransferModel transferModel)
+        public async Task<bool> postTransactionAsync (TransferModel transferModel, HttpContext context)
         {
             try
             {
@@ -93,7 +96,7 @@ namespace Backend_hempromak.Services
             try
             {
                 if (query_type == "insert")
-                    _dbContext.executeSqlQuery($"INSERT INTO critical_items (sifra, isActive, table_from) VALUES ({Int32.Parse(_item_sifra)}, 1, 'adapteri_nipli') ON DUPLICATE KEY UPDATE isActive = 1");
+                    _dbContext.executeSqlQuery($"INSERT INTO critical_items (sifra, isActive, table_from) VALUES ({Int32.Parse(_item_sifra)}, 1, 'items_adapteri_nipli') ON DUPLICATE KEY UPDATE isActive = 1");
                 else if (query_type == "update")
                     _dbContext.executeSqlQuery($"UPDATE critical_items SET isActive = 0 WHERE sifra = {Int32.Parse(_item_sifra)}");
             }
@@ -218,15 +221,19 @@ namespace Backend_hempromak.Services
 
                 }).GeneratePdf(memoryStream);
 
+
+                var context = _httpContextAccessor.HttpContext;
+                var email = context.Session.GetString("email");
+
                 memoryStream.Position = 0;
 
                 var mailMessage = new MailMessage
                 {
-                    From = new MailAddress("nikpetrovski007@gmail.com"),
+                    From = new MailAddress("hhempromak@gmail.com"),
                     Subject = "Test",
                     Body = "Please find the attached PDF document."
                 };
-                mailMessage.To.Add("nikpetrovski007@gmail.com");
+                mailMessage.To.Add(email);
 
                 var attachment = new Attachment(memoryStream, $"NewPdf.pdf", MediaTypeNames.Application.Pdf);
                 mailMessage.Attachments.Add(attachment);
@@ -368,6 +375,29 @@ namespace Backend_hempromak.Services
 
             return queries;
 
+        }
+
+        public async Task<List<Dictionary<string, object>>> getTableCountAsync(string tables)
+        {
+            try
+            {
+                List<TableDTO> table_list = JsonSerializer.Deserialize<List<TableDTO>>(tables);
+                var query_table = "SELECT ";
+
+                foreach (var table in table_list)
+                {
+                    query_table += $"( SELECT COUNT(*) FROM items_{table.table_name}_details) {table.table_name}";
+                }
+
+                var query = _dbContext.executeSqlQuery(query_table);
+
+                return query;
+
+            }
+            catch(Exception ex)
+            {
+                throw new Exception(ex.ToString());
+            }
         }
 
     }

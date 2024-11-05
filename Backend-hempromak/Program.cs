@@ -30,6 +30,17 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
      };
  });
 
+builder.Services.AddDistributedMemoryCache();
+builder.Services.AddHttpContextAccessor();
+
+builder.Services.AddSession(options =>
+{
+    options.IdleTimeout = TimeSpan.FromDays(30);
+    options.Cookie.HttpOnly = true;
+    options.Cookie.IsEssential = true;
+});
+
+builder.Services.AddHttpContextAccessor();
 
 builder.Services.AddCors(options =>
 {
@@ -55,7 +66,7 @@ if (app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 
 app.UseCors();
-
+app.UseSession();
 app.UseAuthentication();
 app.UseAuthorization();
 
