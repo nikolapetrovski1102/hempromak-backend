@@ -13,6 +13,7 @@ using System.Net.Mail;
 using System.Net.Mime;
 using System.ComponentModel;
 using System.Xml.Linq;
+using System.Collections.Immutable;
 
 
 namespace Backend_hempromak.Controllers
@@ -25,9 +26,9 @@ namespace Backend_hempromak.Controllers
 
         private readonly DbContext _dbContext;
         private readonly IConfiguration _configuration;
-        private readonly DataService _dataService;
+        private readonly IDataService _dataService;
 
-        public DataController (IConfiguration configuration, DataService dataService)
+        public DataController (IConfiguration configuration, IDataService dataService)
         {
             _dbContext = new DbContext ();
             _configuration = configuration;
@@ -81,7 +82,7 @@ namespace Backend_hempromak.Controllers
         {
             try
             {
-                await _dataService.postTransactionAsync(transferModel, HttpContext);
+                await _dataService.postTransactionAsync(transferModel);
 
                 return Ok();
             }

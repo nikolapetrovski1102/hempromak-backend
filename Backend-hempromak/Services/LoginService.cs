@@ -14,10 +14,13 @@ using Microsoft.AspNetCore.Identity.Data;
 using System.Security.Cryptography;
 using System.Text.Json.Serialization;
 using System.Text.Json;
+using Azure;
+using Google.Protobuf.WellKnownTypes;
+using static QuestPDF.Helpers.Colors;
 
 namespace Backend_hempromak.Services
 {
-    public class LoginService
+    public class LoginService : ILoginService
     {
         private readonly DbContext _dbContext;
         private readonly IConfiguration _configuration;
@@ -66,9 +69,6 @@ namespace Backend_hempromak.Services
                 var foundPassword = storedPassword[0]["Password"].ToString();
 
                 if (storedPassword == null || !VerifyPassword(loginRequest.Password, foundPassword)) return null;
-
-                var context = _httpContextAccessor.HttpContext;
-                context.Session.SetString("email", loginRequest.EmailOrUsername.ToString());
 
                 return GenerateJwtToken(loginRequest);
             }

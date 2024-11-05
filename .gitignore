@@ -6,7 +6,7 @@ project.lock.json
 nupkg/
 
 # Visual Studio Code
-.vscode/
+.vs/
 
 # Rider
 .idea/
@@ -25,6 +25,9 @@ nupkg/
 *.user
 *.userosscache
 *.sln.docstates
+*.TMP
+
+./build
 
 # Build results
 [Dd]ebug/

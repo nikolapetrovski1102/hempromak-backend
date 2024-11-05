@@ -1,10 +1,17 @@
+using Backend_hempromak.Models;
+using Backend_hempromak.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
-using static Mysqlx.Expect.Open.Types.Condition.Types;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.SqlServer;
+
+using EFCoreDbContext = Microsoft.EntityFrameworkCore.DbContext;
 
 var builder = WebApplication.CreateBuilder(args);
 
+
+IConfiguration configuration = (new ConfigurationBuilder().SetBasePath(Directory.GetCurrentDirectory()).AddJsonFile("appsettings.json").Build());
 // Add services to the container.
 
 builder.Services.AddControllers();
@@ -30,8 +37,13 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
      };
  });
 
-builder.Services.AddDistributedMemoryCache();
+builder.Services.AddScoped<Backend_hempromak.Models.DbContext>();
+
+builder.Services.AddScoped<ILoginService, LoginService>();
+builder.Services.AddScoped<IDataService, DataService>();
+
 builder.Services.AddHttpContextAccessor();
+builder.Services.AddDistributedMemoryCache();
 
 builder.Services.AddSession(options =>
 {
@@ -47,7 +59,7 @@ builder.Services.AddCors(options =>
     options.AddDefaultPolicy(
         policy =>
         {
-            policy.WithOrigins("http://localhost:3001")
+            policy.WithOrigins("http://localhost:3001", "http://cyberlink-001-site35.atempurl.com")
             .AllowAnyMethod()
               .AllowAnyHeader()
               .AllowCredentials();
@@ -57,18 +69,17 @@ builder.Services.AddCors(options =>
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
+app.UseSwagger();
+app.UseSwaggerUI();
+
 
 app.UseHttpsRedirection();
 
 app.UseCors();
-app.UseSession();
 app.UseAuthentication();
 app.UseAuthorization();
+
+app.UseSession();
 
 app.MapControllers();
 

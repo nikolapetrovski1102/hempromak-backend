@@ -15,7 +15,7 @@ using Microsoft.AspNetCore.Http.HttpResults;
 
 namespace Backend_hempromak.Services
 {
-    public class DataService
+    public class DataService : IDataService
     {
 
         private readonly DbContext _dbContext;
@@ -30,7 +30,7 @@ namespace Backend_hempromak.Services
             _httpContextAccessor = httpContextAccessor;
         }
 
-        public async Task<bool> postTransactionAsync (TransferModel transferModel, HttpContext context)
+        public async Task<bool> postTransactionAsync (TransferModel transferModel)
         {
             try
             {
@@ -221,9 +221,7 @@ namespace Backend_hempromak.Services
 
                 }).GeneratePdf(memoryStream);
 
-
-                var context = _httpContextAccessor.HttpContext;
-                var email = context.Session.GetString("email");
+                var email = transferModel.email ?? "";
 
                 memoryStream.Position = 0;
 

@@ -8,5 +8,6 @@
         public string ispratnicaBroj { get; set; }
         public string voziloBroj { get; set; }
         public string type { get; set; }
+        public string email { get; set; }
     }
 }
